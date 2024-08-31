@@ -1,0 +1,21 @@
+# Ignore pytest cache directory
+.pytest_cache/
+
+# Ignore pytest temporary directories
+.tmp*
+
+# If you have virtual environments that include pytest and you want to exclude them
+# you might ignore common virtual environment directory names like:
+venv/
+koshenv/
+.virtualenv/
+
+# If there are specific pytest-related files you want to ignore, add them like this:
+# some_specific_pytest_file.txt
+
+# If pytest creates any specific log or data files you wish to ignore, you can also add them:
+*.log
+*.data
+
+# Test , Text files
+*.txt
