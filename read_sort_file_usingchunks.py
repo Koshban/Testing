@@ -91,7 +91,7 @@ def read_and_sort_using_external_merge_sort(filenames: list[str], outputfile: st
                 temp_files.append(temp_file.name)
 
     # Phase 2: Merge the sorted chunks
-    with open(file=outputfile2, mode='w', encoding='utf-8') as file_write:
+    with open(file=outputfile, mode='w', encoding='utf-8') as file_write:
         try:
             heap = []
             files = [open(f) for f in temp_files]
