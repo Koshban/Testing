@@ -21,7 +21,7 @@ x.next = y
 sum_list(x) # 42
 '''
 
-from LinkedList_implementation import Node
+from TaroDSA.LinkedList.LinkedList_implementation import Node
 
 # def sum_list(head) -> int:
 #     sum, current = 0, head

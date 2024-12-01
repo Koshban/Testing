@@ -32,7 +32,7 @@ c.next = d
 # a -> b -> c -> d
 linked_list_find(a, "q") # False
 '''
-from LinkedList_implementation import Node
+from TaroDSA.LinkedList.LinkedList_implementation import Node
 # def linked_list_find(head, target: str) -> bool:
 #     current = head
 #     while current is not None:

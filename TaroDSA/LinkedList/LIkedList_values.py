@@ -20,7 +20,7 @@ x.next = y
 linked_list_values(x) # -> [ 'x', 'y' ]
 '''
 
-from LinkedList_implementation import Node #, print_list as printlist
+from TaroDSA.LinkedList.LinkedList_implementation import Node #, print_list as printlist
 
 def linked_list_values(head) -> list[str]:
     values_array = []
