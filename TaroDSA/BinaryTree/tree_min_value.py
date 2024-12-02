@@ -37,7 +37,7 @@ def tree_min_value_recursively(root) -> int:
 
 ''' Using BFS '''
 
-def tree_min_value_BFS(root) -> int:
+def tree_min_value(root) -> int:
     if root is None:
         return 0
     minval = float('inf')
@@ -50,12 +50,7 @@ def tree_min_value_BFS(root) -> int:
         
         if current.right is not None:
             queue.append(current.right)
-    return minval
-
-
-
-    
-
+    return minval  
 
 if __name__ == "__main__":
     a = Node(3)

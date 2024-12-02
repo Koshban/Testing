@@ -6,29 +6,31 @@ You may assume that the input tree is non-empty.
 from BinaryTreeClass import Node
 
 # Iterrative solution
-def max_path_sum(root) -> int:
-    maxpathsum = float('-inf')
-    if root is None:
-        return maxpathsum
-    stack = [root]
-    while stack:
-        current = stack.pop()
-        maxpathsum = max(maxpathsum, current.val )
-
-        if current.left is not None:
-            stack.append(current.left)
-
-        if current.right is not None:
-            stack.append(current.right)
-    
-    return maxpathsum
-
-# Recursive solution
 # def max_path_sum(root) -> int:
+#     maxpathsum = float('-inf')
 #     if root is None:
-#         return 0
+#         return maxpathsum
+#     stack = [root]
+#     while stack:
+#         current = stack.pop()
+#         maxpathsum = max(maxpathsum, current.val )
+
+#         if current.left is not None:
+#             stack.append(current.left)
+
+#         if current.right is not None:
+#             stack.append(current.right)
     
-#     return root.val + max(max_path_sum(root.left), max_path_sum(root.right))
+#     return maxpathsum
+
+#Recursive solution
+def max_path_sum(root) -> int:
+    if root is None:
+        return float('-inf')
+    if root.left is None and root.right is None:
+        return root.val
+    
+    return root.val + max(max_path_sum(root.left), max_path_sum(root.right))
 
 
 if __name__ == "__main__":
