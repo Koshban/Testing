@@ -29,7 +29,7 @@ def depth_first_values_iterative(root):
         return values
     stack = [root]
     while stack: # While its not empty its truthy
-        current = stack.pop()
+        current = stack.pop() 
         values.append(current.val)
         
         if current.right is not None:
