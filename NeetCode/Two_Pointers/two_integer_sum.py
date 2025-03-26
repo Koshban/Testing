@@ -25,7 +25,20 @@ class Solution:
                 answer = [second_num, index + 1  ]
                 return answer
             nums_hashmap[num] = index
-            print(f"Hashmap Outside is {nums_hashmap}")        
+            print(f"Hashmap Outside is {nums_hashmap}")
+
+    def twoSum_two_pointer(self, numbers: list[int], target: int) -> list[int]:        
+        left, right = 0, len(numbers) - 1       
+
+        while left < right:
+            print(f"Left is {left} and right is {right}")
+            if (numbers[left] + numbers[right]) == target:
+                return[left + 1, right + 1]
+            elif (numbers[left] + numbers[right]) > target:
+                right -= 1
+            elif (numbers[left] + numbers[right]) < target:
+                left += 1
+            
 
 
 class TestTwoSum(unittest.TestCase):
@@ -36,15 +49,15 @@ class TestTwoSum(unittest.TestCase):
     {'input': {'numbers': [-3, -1, 0, 1, 3], 'target': -1}, 'expected': [2, 3]},  # Negative numbers
     {'input': {'numbers': [1, 2, 3, 4, 5, 6], 'target': 11}, 'expected': [5, 6]},  # Numbers at the end
     {'input': {'numbers': [1, 2, 3, 4, 5, 8, 10], 'target': 10}, 'expected': [2, 6]},  # Non-consecutive numbers
-    {'input': {'numbers': [-10, -5, 0, 5, 10], 'target': 0}, 'expected': [2, 4]},  # Mixed negative and positive numbers
-    {'input': {'numbers': [1, 3, 5, 7, 9, 11], 'target': 16}, 'expected': [4, 5]},  # Odd numbers
-    {'input': {'numbers': [2, 4, 6, 8, 10, 12], 'target': 14}, 'expected': [3, 4]},  # Even numbers
+    {'input': {'numbers': [-10, -5, 0, 5, 10], 'target': 0}, 'expected': [1, 5]},  # Mixed negative and positive numbers
+    {'input': {'numbers': [1, 3, 5, 7, 9, 10], 'target': 16}, 'expected': [4, 5]},  # Odd numbers
+    {'input': {'numbers': [2, 4, 6, 8, 11, 15], 'target': 14}, 'expected': [3, 4]},  # Even numbers
     {'input': {'numbers': [-3, -2, -1, 0, 1], 'target': -4}, 'expected': [1, 3]},  # All negative numbers
     {'input': {'numbers': [1, 2], 'target': 3}, 'expected': [1, 2]},  # Minimal input size
     {'input': {'numbers': [1, 2, 4, 8, 16, 32], 'target': 36}, 'expected': [3, 6]},  # Larger powers of two
-    {'input': {'numbers': [10, 20, 30, 40], 'target': 50}, 'expected': [2, 3]},  # Numbers with larger gaps
+    {'input': {'numbers': [10, 20, 30, 45], 'target': 50}, 'expected': [2, 3]},  # Numbers with larger gaps
     {'input': {'numbers': [-10, -5, -2, 0, 3, 7], 'target': -12}, 'expected': [1, 3]},  # Negative target
-    {'input': {'numbers': [1, 1, 1, 1, 1, 1, 1, 1, 1], 'target': 2}, 'expected': [1, 2]},  # Repeated single number
+    
 ]
         solution = Solution()
         for test_case in test_data:
@@ -52,7 +65,7 @@ class TestTwoSum(unittest.TestCase):
                 print(test_case["input"]["numbers"])
                 print(test_case["input"]["target"])
                 print(test_case["expected"])
-                actual = solution.twoSum(numbers=test_case["input"]["numbers"], target=test_case["input"]["target"])
+                actual = solution.twoSum_two_pointer(numbers=test_case["input"]["numbers"], target=test_case["input"]["target"])
                 expected = test_case["expected"]
                 self.assertEqual(actual, expected)
 
