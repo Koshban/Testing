@@ -5,8 +5,9 @@ Given an array of integers, write a function to find the maximum sum of a contig
 def maximumSum(mylist :list[int]) -> int:
     sum, maxsum = 0, -float('inf')
     for index, number in enumerate(mylist):
-        sum = max((sum + number), number)
+        sum = max(sum + number, number)
         maxsum = max(sum, maxsum)
+        print(f"At {number} , Sum is {sum} and MaxSum is {maxsum}")
     return maxsum
 
 if __name__ == '__main__':
