@@ -55,8 +55,6 @@ class LRUCache:
 
     def get(self, key: int) -> int:        
         if key in self.cachedict.keys():
-            # self.mru += 1
-            # self.cachedict[key][1] = self.mru
             self.remove(self.cachedict[key]) # Remove from List
             self.insert(self.cachedict[key]) # Add at MRU ie rightmost position
             return self.cachedict[key].value
@@ -64,9 +62,6 @@ class LRUCache:
         
 
     def put(self, key: int, value: int) -> None:
-        # if len(self.cachedict) <= self.capacity:
-        #     self.cachedict[key][0] = value
-        #     self.cachedict[key][1] = 1
         if key in self.cachedict.keys():
             self.remove(self.cachedict[key])
             self.cachedict[key] = Node(key=key, value=value)
