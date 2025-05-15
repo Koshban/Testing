@@ -13,6 +13,24 @@ import unittest
 import re
 from collections import Counter
 
+def is_anagrams_using_sorted(strings : list) -> bool:
+    print(strings)
+    if len(strings) == 2:
+        try:
+            string1, string2 = strings[0], strings[1]
+            string1 = string1.replace(' ', '').lower()
+            string2 = string2.replace(' ', '').lower()
+            if sorted(string1) == sorted(string2):
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f'Incorrect Input. Error Encountered {e}')
+            return -1
+
+
+    else:
+        return -1, f'Incorrect Input length. Should be 2 words only'
 def is_anagram(t: str, s: str) -> bool:
     t = re.sub(r'[^a-zA-Z]','', t)
     s = re.sub(r'[^a-zA-Z]','', s)
