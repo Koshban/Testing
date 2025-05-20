@@ -55,7 +55,7 @@ class LogMonitor:
                     logger.info(f"Loaded last position {pos} for {self.logpath}")
                     return pos
             except Exception as e:
-                logger.warning(f"Failed to load last position: {e}")
+                logger.exception(f"Failed to load last position: {e}")
         # If no saved position, start from beginning
         logger.info(f"Starting from position 0 for {self.logpath}")
         return 0
@@ -72,7 +72,7 @@ class LogMonitor:
                 json.dump(data, f)
             logger.debug(f"Saved last position {self.last_position} for {self.logpath}")
         except Exception as e:
-            logger.error(f"Failed to save last position: {e}")
+            logger.exception(f"Failed to save last position: {e}")
 
 
     def send_email(self, matches: list[str]) -> None:
@@ -197,7 +197,7 @@ class LogMonitor:
                                     logger.debug(f"Match found: {line[:100]}...")
                                     
                         except UnicodeDecodeError:
-                            logger.warning(f"Could not decode chunk at position {mm.tell()}")
+                            logger.exception(f"Could not decode chunk at position {mm.tell()}")
                             continue
                     
                     self.last_position = mm.tell()
@@ -205,9 +205,9 @@ class LogMonitor:
                     logger.info(f"Processed {chunks_processed} chunks, found {len(matches)} matches")
 
         except FileNotFoundError:
-            logger.error(f"Log file not found: {self.log_path}")
+            logger.exception(f"Log file not found: {self.log_path}")
         except Exception as e:
-            logger.error(f"Error reading log file: {e}")
+            logger.exception(f"Error reading log file: {e}")
             
         return matches
 
@@ -232,7 +232,7 @@ class LogMonitor:
         except KeyboardInterrupt:
             logger.info("Monitoring stopped by user")
         except Exception as e:
-            logger.error(f"Unexpected error: {e}")
+            logger.exception(f"Unexpected error: {e}")
             raise
 
 def main():
