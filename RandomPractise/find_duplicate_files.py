@@ -24,113 +24,96 @@ Approach : Use cryptographic Hash function e.g. SHA256 to find the dupes ?
  2.4 ) If not, add to the dictionary
 
 '''
-
 import os
 import hashlib
+import logging
 import xxhash
-import pprint
+from pathlib import Path
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-print(f"Base directory is : {BASE_DIR}")
-ignore_folders = ["/tmp", "koshenv"]
+IGNORE_FOLDERS = {"tmp", "koshenv"}  # folder names without slashes for matching
 
-def should_skip_path(path, exclude_folders):
-    # Convert DirEntry to string if necessary
-    path_str = path.path if isinstance(path, os.DirEntry) else str(path)
-
-    if any(excluded in path_str for excluded in exclude_folders):
+def should_skip_path(path: str, exclude_folders: set[str]) -> bool:
+    # Skip hidden files/folders or excluded folder names anywhere in the path
+    parts = Path(path).parts
+    if any(part.startswith('.') for part in parts):
         return True
-    
-    path_parts = path_str.split(os.sep)
-    return any(part.startswith('.') for part in path_parts)
+    if exclude_folders.intersection(parts):
+        return True
+    return False
 
-def traverse_directory(directory, exclude_folders, file_hashes, duplicates):
+def hash_file(filepath: str) -> str | None:
     try:
-        for entry in os.scandir(directory):
-            if entry.is_symlink():
-                continue # Skip Symlinks
-
-            if entry.is_dir():
-                if not should_skip_path(path=entry, exclude_folders=exclude_folders):
-                    traverse_directory(directory=entry.path, exclude_folders=exclude_folders, file_hashes=file_hashes, duplicates=duplicates)
-            else:
-                if not os.path.basename(entry.path).startswith('.'):
-                    process_file(file_path=entry.path, file_hashes=file_hashes, duplicates=duplicates)    
-
-    except PermissionError:
-        print(f"Permission Denied on : {directory}")
-
-def hash_file(filename):
-    try:
-        #h = hashlib.sha256()
         h = xxhash.xxh64()
-        with open(file=filename, mode='rb', buffering=0) as f:
-            for b in iter(lambda : f.read(128 * 1024), b''): #iter(func, sentinel) creates an iterator that calls func until it returns the sentinel value.
-                h.update(b)
-            return h.hexdigest() # hexdigest() returns the hash as a string of hexadecimal digits
+        with open(filepath, 'rb') as f:
+            for chunk in iter(lambda: f.read(128 * 1024), b''):
+                h.update(chunk)
+        return h.hexdigest()
     except Exception as e:
-        print(f"Encountered error in hash_file for file ; {filename}. Error is :{str(e)}")
+        logger.warning(f"Failed to hash file {filepath}: {e}")
         return None
 
-
-def get_file_info(file_path):
+def get_file_info(filepath: str) -> dict | None:
     try:
-        if os.name == 'nt':
-            creation_time = os.path.getmtime(file_path)
-        else:
-            creation_time = (os.stat(file_path)).st_mtime
+        stat = os.stat(filepath)
         return {
-            'path': file_path,
-            'creation_time': creation_time,
-            'size': os.path.getsize(file_path)
+            'path': filepath,
+            'ctime': stat.st_mtime,
+            'size': stat.st_size
         }
     except Exception as e:
-        print(f"Encountered error in file_info for file ; {file_path}. Error is :{str(e)}")
+        logger.warning(f"Failed to get info for file {filepath}: {e}")
         return None
 
+def find_duplicates(root_dir: str, exclude_folders: set[str]) -> list[tuple[str, str]]:
+    file_hashes: dict[str, dict] = {}
+    duplicates: list[tuple[str, str]] = []
 
-def process_file(file_path, file_hashes, duplicates):
-    try:
-        #print(f"1: {file_path}")
-        file_info = get_file_info(file_path)
-        #print(f"2: {file_path}")
-        if file_info is None:
-            print(f"Skipping file due to error: {file_path}")
-            return
-        file_hash = hash_file(file_path)
-        if file_hash in file_hashes:
-            existing_info = file_hashes[file_hash]
-            if file_info['creation_time'] < existing_info['creation_time']:
-                # Current file is older, treat it as original
-                duplicates.append((existing_info['path'], file_path))
-                file_hashes[file_hash] = file_info
+    for current_root, dirs, files in os.walk(root_dir):
+        # Modify dirs in-place to prune excluded or hidden folders
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in exclude_folders]
+
+        # Skip this whole folder if it's excluded or hidden
+        if should_skip_path(current_root, exclude_folders):
+            continue
+
+        for filename in files:
+            if filename.startswith('.'):
+                continue
+            filepath = os.path.join(current_root, filename)
+            if should_skip_path(filepath, exclude_folders):
+                continue
+
+            file_info = get_file_info(filepath)
+            if file_info is None:
+                continue
+
+            file_hash = hash_file(filepath)
+            if file_hash is None:
+                continue
+
+            if file_hash in file_hashes:
+                current_original = file_hashes[file_hash]
+                # Oldest file is original
+                if file_info['ctime'] < current_original['ctime']:
+                    duplicates.append((current_original['path'], filepath))
+                    file_hashes[file_hash] = file_info
+                else:
+                    duplicates.append((filepath, current_original['path']))
             else:
-                # Current file is newer, treat it as duplicate
-                duplicates.append((file_path, existing_info['path']))
-        else:
-            file_hashes[file_hash] = file_info
-    except Exception as e:
-        print(f"Caught Exception in process_file while processing Path : {file_path}. Error is : {str(e)}")
-    
-def find_files(root_dir, exclude_folders=None) -> list[str]:
-    if exclude_folders is None:
-        exclude_folders = []
+                file_hashes[file_hash] = file_info
 
-    file_hashes = {}
-    duplicates = []
-    
-    traverse_directory(directory=root_dir, exclude_folders=exclude_folders, file_hashes=file_hashes, duplicates=duplicates)
     return duplicates
 
 def main():
-    
-    duplicate_files = find_files(root_dir=BASE_DIR, exclude_folders=ignore_folders)
-    for dupe, original in duplicate_files:
+    duplicates = find_duplicates(BASE_DIR, IGNORE_FOLDERS)
+    for dupe, orig in duplicates:
         print(f"Duplicate: {dupe}")
-        print(f"Original: {original}")
+        print(f"Original : {orig}")
         print()
-    #pprint.pprint(duplicate_files)
 
 if __name__ == "__main__":
     main()
-    
