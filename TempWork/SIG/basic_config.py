@@ -1,17 +1,18 @@
 import logging
-import os
 import inspect
 from datetime import datetime
+from collections import defaultdict
+from typing import Generator
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGS_DIR = os.path.join(BASE_DIR, "logs")
-os.makedirs(LOGS_DIR, exist_ok=True)  # Ensure logs directory exists
+BASE_DIR = Path(__file__).parent.resolve()
+SAFE_DIR = BASE_DIR.parent
+LOGS_DIR = BASE_DIR/"logs"
+LOGS_DIR.mkdir(exist_ok=True)
 now = datetime.now().strftime('%Y%m%d_%H%M')
-scriptname = os.path.splitext(os.path.basename(__file__))[0]
-logfilename = os.path.join(LOGS_DIR, f'{scriptname}_{now}.log')
-
+scriptname = Path(__file__).stem
+logfilename = LOGS_DIR/f'{scriptname}_{now}.log'
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s'
-
 logging.basicConfig(
     level = logging.DEBUG,
     format = LOG_FORMAT,
@@ -20,7 +21,6 @@ logging.basicConfig(
         logging.FileHandler(logfilename)
     ]
 )
-
 logger = logging.getLogger()
 
 def get_logger(logger_name=None, log_path=None):
