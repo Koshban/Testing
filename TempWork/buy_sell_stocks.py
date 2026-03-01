@@ -35,35 +35,31 @@ logging.basicConfig(
     ]
 )
 def buy_sell_stocks_only_once(prices: list[int]) -> int:
-    maxprofit, min_price = 0, float('inf')
     if not prices or len(prices) < 2:
         return -1
+    min_price, max_profit = float('inf'), 0
+    #[7,1,5,3,6,4,6]
     for day, price in enumerate(prices):
         min_price = min(price, min_price)
         profit = price - min_price
-        maxprofit = max(profit, maxprofit)
-    return maxprofit
+        max_profit = max(max_profit, profit)
+    return max_profit
 
 def buy_sell_multiple_times(prices: list[int]) -> int:
     if not prices or len(prices) < 2:
         return -1
-    
     buy_price, total_profit = prices[0], 0
     for day, price in enumerate(prices[1:]):
         if price < buy_price:
             buy_price = price
-            buy_day = day
-            logging.info(f"Bought on day: {buy_day} for Price: {buy_price}")
-        elif price > buy_price:
-            profit = price - buy_price # Take profit
-            buy_price = price # Buy Back
+            logging.info(f"Bought on Day {day} for a price of {price}")
+        else:
+            profit = price - buy_price
             total_profit += profit
-            sell_day = day
-            logging.info(f"Sold on day: {sell_day} for Price: {price}")
+            buy_price = price # Buy Back
+            logging.info(f"Sold on day: {day} for Price: {price}. Making a profit of {profit}")
     return total_profit
-
-
-
+            
 class TestBuySellStocks(unittest.TestCase):
     def test_buy_sell_stocks(self):
         test_data_multiple = [
